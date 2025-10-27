@@ -51,48 +51,16 @@ class MainActivity : AppCompatActivity() {
         MobileAds.initialize(this) {}
         adView.loadAd(AdRequest.Builder().build())
 
-        val service = hoho.stock.dividends.data.service.CorpInfoService()
-        val corpList = service.readXmlFromAssets(this, "corpcode.xml")
-
-        /*for (corp in corpList) {
-            Log.d("XML_RESULT>>>>>>>>", "${corp.corpCode} / ${corp.corpName} / ${corp.corpEngName}")
-        }*/
-
-        // 1. 검색할 글자(검색어) 정의
-        val searchKeyword = "삼성"
-
-        // 2. 'corpList'에서 'corpName'에 검색어가 포함된 항목만 필터링
-        val filteredCorpList = corpList.filter { corp ->
-            // 'corpName'이 'searchKeyword'를 포함하는지 확인합니다.
-            // 'contains'는 대소문자를 구분하지만, 'ignoreCase = true'를 추가하여 대소문자 구분을 무시할 수 있습니다.
-            corp.corpName.contains(searchKeyword, ignoreCase = true)
-        }
-
-        // 3. 검색된 결과(필터링된 리스트)를 출력
-        for (corp in filteredCorpList) {
-            Log.d("SEARCH_RESULT>>>>>>>", "검색됨: ${corp.corpCode} / ${corp.corpName}")
-        }
-
-        // 4. 검색된 결과가 없을 경우 메시지 출력 (선택 사항)
-        if (filteredCorpList.isEmpty()) {
-            Log.d("SEARCH_RESULT>>>>>>>", "'$searchKeyword'를 포함하는 회사가 없습니다.")
-        }
-
-        /*
-        // 1. Mobile Ads SDK 초기화
-        MobileAds.initialize(this) {}
-
-        // 2. 레이아웃의 AdView를 찾습니다.
-        val adView: AdView = findViewById(R.id.adView)
-
-        // 3. 광고 요청을 생성합니다.
-        val adRequest = AdRequest.Builder().build()
-
-        // 4. 광고를 불러옵니다.
-        adView.loadAd(adRequest)
-        */
-
         // --- 여기까지 광고 코드 ---
+
+        //val service = hoho.stock.dividends.data.service.CorpInfoService()
+        //val corpList = service.readXmlFromAssets(this, "corpcode.xml")
+        // ⭐⭐ 캐시된 데이터 사용 (MainActivity에서는 이제 조회만 합니다) ⭐⭐
+        val application = application as MyApplication
+        val corpList: List<CorpInfo>? = application.corpListCache
+
+        // 필요한 경우, 로드된 데이터 확인용 로그
+        Log.d("MainActivity", "Using cached corpList. Size: ${corpList?.size ?: 0}")
 
         setSupportActionBar(binding.appBarMain.toolbar)
 

@@ -11,7 +11,7 @@
 
     <!-- 정보의 '키' (예: 법인구분) -->
     <TextView
-        android:id="@+id/info_key_text_view"
+        android:id="@+id/text_corp_name"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:textSize="16sp"
@@ -20,7 +20,7 @@
 
     <!-- 정보의 '값' (예: Y) -->
     <TextView
-        android:id="@+id/info_value_text_view"
+        android:id="@+id/text_corp_code"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
