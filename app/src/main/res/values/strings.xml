@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">배당금 조회</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">배당금 조회</string>
+    <string name="nav_header_subtitle">소소한 주식 정보</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">홈</string>
+    <string name="menu_gallery">배당금 조회</string>
+    <string name="menu_slideshow">일별 시세 조회</string>
+</resources>
