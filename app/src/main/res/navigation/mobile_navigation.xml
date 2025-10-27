@@ -12,14 +12,14 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="hoho.stock.dividends.ui.gallery.GalleryFragment"
+        android:id="@+id/nav_stockdividends"
+        android:name="hoho.stock.dividends.ui.stockdividends.StockdividendsFragment"
         android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_stockdividends" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="hoho.stock.dividends.ui.slideshow.SlideshowFragment"
+        android:id="@+id/nav_stockprice"
+        android:name="hoho.stock.dividends.ui.stockprice.StockpriceFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_stockprice" />
 </navigation>

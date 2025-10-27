@@ -4,19 +4,81 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".ui.home.HomeFragment">
 
     <TextView
         android:id="@+id/text_home"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:text="내 손 안의 재활용품 가격 정보"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/text_warning_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:padding="12dp"
+        android:background="#E0F7FA"
+        android:textColor="#00796B"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@id/text_home"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/price_info_warning"
+        android:autoLink="web"
+        android:linksClickable="true"
+        />
+
+    <!-- ⭐⭐ 재활용품 가격정보 버튼 (왼쪽, 더 크게) ⭐⭐ -->
+    <Button
+        android:id="@+id/btn_stock_dividends"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:text="@string/nav_header_title"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#3F51B5"
+        app:cornerRadius="12dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="32dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_stock_price"
+
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        />
+
+    <!-- ⭐⭐ 공식 자료 바로가기 버튼 (오른쪽, 녹색 계열) ⭐⭐ -->
+    <Button
+        android:id="@+id/btn_stock_price"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:text="일별 시세 조회"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#4CAF50"
+        app:cornerRadius="12dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="32dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_stock_dividends"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintHorizontal_weight="1"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

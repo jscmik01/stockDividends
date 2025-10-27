@@ -10,4 +10,12 @@
     <string name="menu_home">홈</string>
     <string name="menu_gallery">배당금 조회</string>
     <string name="menu_slideshow">일별 시세 조회</string>
+
+    <string name="price_info_warning">
+        <![CDATA[
+        <b>📢 배당금 조회</b><br><br>
+
+        <br><br>✨ ]]>
+    </string>
+
 </resources>
