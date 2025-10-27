@@ -12,17 +12,58 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import hoho.stock.dividends.databinding.ActivityMainBinding
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
+import android.content.IntentSender
+import android.content.Intent
+import android.app.Activity
+import android.util.Log
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
+    private lateinit var appUpdateManager: AppUpdateManager // AppUpdateManager 선언
+    private val REQ_CODE_APP_UPDATE = 100 // 업데이트 요청 코드
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        appUpdateManager = AppUpdateManagerFactory.create(this) // AppUpdateManager 초기화
+        checkAndStartUpdate() // 앱 시작 시 업데이트 확인 및 시작
+
+        // --- 여기부터 광고 코드 ---
+
+        // AdView는 onCreate에서 초기화
+        val adView: AdView = findViewById(R.id.adView)
+        MobileAds.initialize(this) {}
+        adView.loadAd(AdRequest.Builder().build())
+
+        /*
+        // 1. Mobile Ads SDK 초기화
+        MobileAds.initialize(this) {}
+
+        // 2. 레이아웃의 AdView를 찾습니다.
+        val adView: AdView = findViewById(R.id.adView)
+
+        // 3. 광고 요청을 생성합니다.
+        val adRequest = AdRequest.Builder().build()
+
+        // 4. 광고를 불러옵니다.
+        adView.loadAd(adRequest)
+        */
+
+        // --- 여기까지 광고 코드 ---
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
@@ -45,6 +86,14 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
+    // ⭐⭐ 새로 추가할 함수: 배너 광고를 다시 로드합니다. ⭐⭐
+    fun reloadBannerAd() {
+        val adView: AdView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+        Log.d("AdReload", "Banner ad reloaded from HomeFragment.")
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
@@ -54,5 +103,82 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+
+    // 이 함수는 앱 업데이트의 가용성을 확인하고, 업데이트가 필요하면 즉시 업데이트 흐름을 시작
+    private fun checkAndStartUpdate() {
+        // 앱 업데이트 가용성 확인
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            // 업데이트 가능하며, 즉시 업데이트 타입인 경우
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        AppUpdateType.IMMEDIATE,
+                        this,
+                        REQ_CODE_APP_UPDATE
+                    )
+                } catch (e: IntentSender.SendIntentException) {
+                    e.printStackTrace()
+                    // 업데이트 흐름 시작 실패 처리
+                    Log.e("AppUpdate", "Failed to start update flow: ${e.message}")
+                }
+            }
+            // DEVELOPER_TRIGGERED_UPDATE_NEEDED 대신 DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS 사용
+            else if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                // 개발자가 트리거한 업데이트가 이미 진행 중인 경우 (Flex 업데이트 도중 강제 업데이트로 전환 등)
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        AppUpdateType.IMMEDIATE, // 또는 AppUpdateType.FLEXIBLE
+                        this,
+                        REQ_CODE_APP_UPDATE
+                    )
+                } catch (e: IntentSender.SendIntentException) {
+                    e.printStackTrace()
+                    Log.e("AppUpdate", "Failed to restart developer-triggered update flow: ${e.message}")
+                }
+            }
+        }.addOnFailureListener { e ->
+            Log.e("AppUpdate", "Failed to check for update: ${e.message}")
+        }
+    }
+
+    // 업데이트 흐름의 결과를 처리하기 위해 onActivityResult를 오버라이드 처리
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQ_CODE_APP_UPDATE) {
+            if (resultCode != Activity.RESULT_OK) {
+                // 업데이트가 취소되거나 실패했을 때의 처리
+                // 사용자가 업데이트를 거부하거나 다운로드에 실패했을 수 있습니다.
+                Log.w("AppUpdate", "Update flow failed! Result code: $resultCode")
+                Toast.makeText(this, "앱 업데이트가 취소되었거나 실패했습니다.", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    // 앱이 백그라운드에서 다시 포그라운드로 돌아왔을 때, 즉시 업데이트가 이미 다운로드되었는지 확인하고 설치를 프롬프트할 수 있습니다. (Immediate update는 사용자가 설치 완료할 때까지 기다리므로, 보통 onActivityResult로 처리되지만, 만약을 위해 추가할 수 있습니다.)
+    override fun onResume() {
+        super.onResume()
+
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            // DEVELOPER_TRIGGERED_UPDATE_NEEDED 대신 DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS 사용
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                // 개발자가 트리거한 업데이트가 이미 진행 중인 경우
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        AppUpdateType.IMMEDIATE, // 또는 AppUpdateType.FLEXIBLE
+                        this,
+                        REQ_CODE_APP_UPDATE
+                    )
+                } catch (e: IntentSender.SendIntentException) {
+                    e.printStackTrace()
+                    Log.e("AppUpdate", "Failed to restart developer-triggered update flow on resume: ${e.message}")
+                }
+            }
+        }
     }
 }
