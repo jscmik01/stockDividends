@@ -24,6 +24,8 @@ import android.content.Intent
 import android.app.Activity
 import android.util.Log
 import android.widget.Toast
+import hoho.stock.dividends.data.model.CorpInfo
+import hoho.stock.dividends.data.service.CorpInfoService
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,6 +50,33 @@ class MainActivity : AppCompatActivity() {
         val adView: AdView = findViewById(R.id.adView)
         MobileAds.initialize(this) {}
         adView.loadAd(AdRequest.Builder().build())
+
+        val service = hoho.stock.dividends.data.service.CorpInfoService()
+        val corpList = service.readXmlFromAssets(this, "corpcode.xml")
+
+        /*for (corp in corpList) {
+            Log.d("XML_RESULT>>>>>>>>", "${corp.corpCode} / ${corp.corpName} / ${corp.corpEngName}")
+        }*/
+
+        // 1. 검색할 글자(검색어) 정의
+        val searchKeyword = "삼성"
+
+        // 2. 'corpList'에서 'corpName'에 검색어가 포함된 항목만 필터링
+        val filteredCorpList = corpList.filter { corp ->
+            // 'corpName'이 'searchKeyword'를 포함하는지 확인합니다.
+            // 'contains'는 대소문자를 구분하지만, 'ignoreCase = true'를 추가하여 대소문자 구분을 무시할 수 있습니다.
+            corp.corpName.contains(searchKeyword, ignoreCase = true)
+        }
+
+        // 3. 검색된 결과(필터링된 리스트)를 출력
+        for (corp in filteredCorpList) {
+            Log.d("SEARCH_RESULT>>>>>>>", "검색됨: ${corp.corpCode} / ${corp.corpName}")
+        }
+
+        // 4. 검색된 결과가 없을 경우 메시지 출력 (선택 사항)
+        if (filteredCorpList.isEmpty()) {
+            Log.d("SEARCH_RESULT>>>>>>>", "'$searchKeyword'를 포함하는 회사가 없습니다.")
+        }
 
         /*
         // 1. Mobile Ads SDK 초기화

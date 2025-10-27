@@ -7,4 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- 다크 모드 지원을 위한 색상 정의 -->
+    <color name="text_primary">#DE000000</color> <!-- 87% Black -->
+    <color name="text_secondary">#8A000000</color> <!-- 54% Black -->
+    <color name="surface_color">#FFFFFFFF</color> <!-- 카드나 검색창 배경 -->
+    <color name="background_color">#FFF5F5F5</color> <!-- 전체 화면 배경 -->
+    <color name="divider_color">#1F000000</color> <!-- 12% Black -->
 </resources>
