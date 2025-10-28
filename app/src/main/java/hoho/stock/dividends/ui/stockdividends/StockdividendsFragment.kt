@@ -145,8 +145,9 @@ class StockdividendsFragment : Fragment() {
 
                     // 국문명(corp_name) 또는 영문명(corp_eng_name)으로 필터링
                     corporations.filter {
-                        it.corpName.lowercase().contains(lowerCaseQuery) ||
-                                it.corpEngName.lowercase().contains(lowerCaseQuery)
+                        (it.corpName.lowercase().contains(lowerCaseQuery) ||
+                                it.corpEngName.lowercase().contains(lowerCaseQuery)) &&
+                                it.stockCode?.isNotBlank() == true
                     }
                         .take(10) // 너무 많은 결과를 표시하지 않도록 최대 10개만 가져오기
                         .forEachIndexed { index, corporation ->
