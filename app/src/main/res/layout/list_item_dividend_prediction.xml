@@ -14,7 +14,7 @@
         android:id="@+id/text_year_quarter"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.2"
+        android:layout_weight="0.8"
         android:gravity="center"
         android:textColor="@android:color/black"
         tools:text="2024년 4분기" />
@@ -41,9 +41,8 @@
         android:id="@+id/text_reported_yield"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="1.4"
         android:gravity="center"
         android:textColor="#1976D2"
         tools:text="(1.93%)" />
-
 </LinearLayout>

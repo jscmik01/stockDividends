@@ -29,18 +29,20 @@ class DividendPredictionService {
             for (i in 0 until jsonArray.length()) {
                 val item: JSONObject = jsonArray.getJSONObject(i)
 
-                predictionList.add(
-                    DividendPrediction(
-                        year = item.optString("year", ""),
-                        code = item.optString("code", ""),
-                        name = item.optString("name", ""),
-                        kind = item.optString("kind", ""),
-                        quarter = item.optString("quarter", ""),
-                        // 정수나 실수는 optInt, optDouble을 사용하여 안전하게 추출합니다.
-                        actual_dividend = item.optInt("actual_dividend", 0),
-                        reported_yield = item.optDouble("reported_yield", 0.0)
+                if(item.optInt("actual_dividend", 0) > 0) {
+                    predictionList.add(
+                        DividendPrediction(
+                            year = item.optString("year", ""),
+                            code = item.optString("code", ""),
+                            name = item.optString("name", ""),
+                            kind = item.optString("kind", ""),
+                            quarter = item.optString("quarter", ""),
+                            // 정수나 실수는 optInt, optDouble을 사용하여 안전하게 추출합니다.
+                            actual_dividend = item.optInt("actual_dividend", 0),
+                            reported_yield = item.optDouble("reported_yield", 0.0)
+                        )
                     )
-                )
+                }
             }
             return predictionList
 

@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -32,9 +33,9 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textHome
+        //val textView: TextView = binding.textHome
         homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+            //textView.text = it
         }
         return root
     }
@@ -67,7 +68,8 @@ class HomeFragment : Fragment() {
 
         // 일일시세조회
         binding.btnStockPrice.setOnClickListener {
-            findNavController().navigate(R.id.nav_stockprice, null, navOptions)
+            //findNavController().navigate(R.id.nav_stockprice, null, navOptions)
+            Toast.makeText(requireContext(), "준비중입니다.", Toast.LENGTH_SHORT).show()
         }
     }
 

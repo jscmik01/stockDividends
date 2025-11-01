@@ -25,7 +25,13 @@ import android.app.Activity
 import android.util.Log
 import android.widget.Toast
 import hoho.stock.dividends.data.model.CorpInfo
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import hoho.stock.dividends.data.service.CorpInfoService
+import androidx.navigation.findNavController
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 
 class MainActivity : AppCompatActivity() {
 
@@ -175,6 +181,33 @@ class MainActivity : AppCompatActivity() {
                     e.printStackTrace()
                     Log.e("AppUpdate", "Failed to restart developer-triggered update flow on resume: ${e.message}")
                 }
+            }
+        }
+    }
+
+    // ⭐⭐⭐ 3. NavController 필드를 사용하여 뒤로 가기 동작 수정 (오류 없음) ⭐⭐⭐
+    override fun onBackPressed() {
+
+        // 내비게이션 그래프에서 홈 화면으로 설정된 ID를 사용합니다.
+        val homeDestinationId = R.id.nav_home
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+
+        // 1. 현재 목적지가 홈 화면인지 확인
+        if (navController.currentDestination?.id == homeDestinationId) {
+            // 현재 홈 화면이면, 시스템 기본 동작 (앱 종료) 실행
+            super.onBackPressed()
+        } else {
+            // 2. 백 스택을 홈 화면까지 팝(pop) 시도
+            // `popBackStack(home, false)`는 백 스택에 home이 있을 때만 돌아가고, 없으면 false를 반환합니다.
+            val popped = navController.popBackStack(homeDestinationId, false)
+
+            if (!popped) {
+                // 3. popBackStack이 실패했을 경우 (다른 top-level destination에 바로 진입한 경우)
+                // -> 홈 화면으로 명시적으로 이동
+                navController.navigate(homeDestinationId)
+
+                // 여기서 super.onBackPressed()를 호출하지 않습니다.
+                // 홈으로 이동했으므로, 다음 뒤로 가기 버튼을 눌러야 종료됩니다.
             }
         }
     }

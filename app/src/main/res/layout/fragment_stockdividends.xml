@@ -61,7 +61,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.8"
 
             android:gravity="center"
             android:text="년도"
@@ -71,7 +71,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.8"
             android:gravity="center"
             android:text="분기"
             android:textStyle="bold"
@@ -89,7 +89,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="1.4"
             android:gravity="center"
             android:text="배당금(배당비율)"
             android:textStyle="bold"
