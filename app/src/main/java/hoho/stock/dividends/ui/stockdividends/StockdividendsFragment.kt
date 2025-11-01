@@ -13,6 +13,7 @@ import hoho.stock.dividends.databinding.FragmentStockdividendsBinding
 import hoho.stock.dividends.ui.stockdividends.StockdividendsViewModel
 import hoho.stock.dividends.data.model.CorpInfo
 import hoho.stock.dividends.MyApplication
+import hoho.stock.dividends.data.model.DividendPrediction
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.widget.SearchView
 import android.database.Cursor
@@ -23,9 +24,16 @@ import android.widget.ArrayAdapter
 import android.widget.CursorAdapter
 import android.widget.SimpleCursorAdapter
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import hoho.stock.dividends.MainActivity // MainActivity import
 import hoho.stock.dividends.R
 import hoho.stock.dividends.data.service.CorpInfoService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import hoho.stock.dividends.config.DART_API_KEY
+import hoho.stock.dividends.data.util.ApiService
+import hoho.stock.dividends.data.service.DividendDetailService
 
 class StockdividendsFragment : Fragment() {
     // ... (기존 변수 및 바인딩) ...
@@ -38,7 +46,8 @@ class StockdividendsFragment : Fragment() {
 
     // lateinit 변수
     private lateinit var corpInfoService: CorpInfoService
-    private lateinit var corpInfoAdapter: CorpInfoAdapter // <--- 초기화되지 않은 변수
+    //private lateinit var corpInfoAdapter: CorpInfoAdapter // <--- 초기화되지 않은 변수
+    private lateinit var dividendPredictionAdapter: DividendPredictionAdapter
 
     private var lastSearchedCorpName: String? = null
     private var lastSearchedJurirNo: String? = null // fetchCompanyInfo에 필요한 경우
@@ -67,11 +76,17 @@ class StockdividendsFragment : Fragment() {
 
         // ⭐⭐ 2. CorpInfoAdapter와 RecyclerView 초기화 (setupSearchView() 호출보다 먼저) ⭐⭐
         // RecyclerView를 사용할 준비가 되어야 Adapter를 초기화할 수 있습니다.
-        corpInfoAdapter = CorpInfoAdapter(displayList)
+        //corpInfoAdapter = CorpInfoAdapter(displayList)
+        dividendPredictionAdapter = DividendPredictionAdapter(emptyList())
         /*binding.companyInfoRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = corpInfoAdapter
         }*/
+        // RecyclerView 초기화
+        binding.companyInfoRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = dividendPredictionAdapter
+        }
 
         // 3. SearchView 리스너 설정
         setupSearchView() // 이 함수 내에서 corpInfoAdapter를 사용합니다
@@ -107,9 +122,6 @@ class StockdividendsFragment : Fragment() {
             // 검색 버튼을 눌렀을 때
             override fun onQueryTextSubmit(query: String?): Boolean {
 
-                // 광고 새로고침
-                //(activity as? MainActivity)?.reloadBannerAd()
-
                 if (query != null) {
                     // 국문명 또는 영문명이 정확히 일치하는 종목 찾기
                     val foundCorp = corporations.find {
@@ -118,12 +130,14 @@ class StockdividendsFragment : Fragment() {
                     }
 
                     if (foundCorp != null) {
+                        // json에서 조회 때문 추가 dividend_predictions.json
+                        lastSearchedCorpInfo = foundCorp
+
                         lastSearchedJurirNo = null
-                        // ⭐⭐ 활성화: fetchCompanyInfo 호출 ⭐⭐
-                        //>>>>fetchCompanyInfo(foundCorp.corpCode) // 이 안에서 ProgressBar 제어
+                        fetchCompanyInfo(foundCorp.corpCode)
 
                         // 정확히 검색된 후, RecyclerView는 비우거나 숨기는 것이 일반적
-                        corpInfoAdapter.updateList(emptyList())
+                        //corpInfoAdapter.updateList(emptyList())
                     }
                 } else {
                     lastSearchedCorpName = null
@@ -162,7 +176,7 @@ class StockdividendsFragment : Fragment() {
                 updateFavoriteButtonIcon() // 아이콘 업데이트
 
                 // 검색 중에는 하단의 RecyclerView 내용을 비웁니다. (선택 사항)
-                corpInfoAdapter.updateList(emptyList())
+                //corpInfoAdapter.updateList(emptyList())
 
                 return true
             }
@@ -174,9 +188,6 @@ class StockdividendsFragment : Fragment() {
 
             // 드롭다운 목록의 항목을 클릭했을 때
             override fun onSuggestionClick(position: Int): Boolean {
-
-                // 광고 새로고침
-                (activity as? MainActivity)?.reloadBannerAd()
 
                 val cursor: Cursor? = binding.stockSearchView.suggestionsAdapter.cursor
                 if (cursor?.moveToPosition(position) == true) {
@@ -193,6 +204,84 @@ class StockdividendsFragment : Fragment() {
     }
 
 
+    /*
+    private val apiService = ApiService()
+    private val dividendDetailService = DividendDetailService()
+    private fun fetchCompanyInfo(corpCode: String) {
+
+        Log.d("선택한 corpcode", "잘나올까나? $corpCode")
+
+        lifecycleScope.launch(Dispatchers.IO) {
+
+            val urlString = "https://opendart.fss.or.kr/api/alotMatter.json?crtfc_key=$DART_API_KEY&corp_code=$corpCode&bsns_year=2024&reprt_code=11011"
+
+            Log.d("선택한 corpcode", "urlString >>> ${urlString}")
+
+            val result = apiService.callApi(urlString)
+            if (result != null) {
+
+
+                Log.d("선택한 corpcode", "결과 >>> ${result}")
+
+                val dividendDetailList = dividendDetailService.parseDividendDetails(result)
+
+                Log.d("선택한 corpcode", "잘나올까나? ${dividendDetailList.size}")
+            } else {
+                // API 호출 실패 시에도 ProgressBar 숨기기
+                withContext(Dispatchers.Main) {
+                    lastSearchedCorpName = null
+                    updateFavoriteButtonIcon()
+                }
+            }
+        }
+    }
+    */
+    private fun fetchCompanyInfo(corpCode: String) {
+
+        Log.d("StockDividends", "선택된 CorpCode: $corpCode")
+
+        // 1. MyApplication에서 캐시된 배당 예측 데이터 가져오기
+        // requireActivity().application을 안전하게 캐스팅하여 사용합니다.
+        val application = requireActivity().application as MyApplication
+        val cachedPredictions = application.dividendPredictionCache
+
+        if (cachedPredictions.isNullOrEmpty()) {
+            Log.w("StockDividends", "배당 예측 캐시 데이터(dividendPredictionCache)가 비어있습니다.")
+            // 사용자에게 알림을 표시할 수 있습니다.
+            Toast.makeText(context, "배당 예측 데이터를 로드할 수 없습니다.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        // 2. 캐시된 리스트에서 해당 종목 코드와 일치하는 데이터 필터링
+        val foundPredictions = cachedPredictions.filter { it.code == corpCode }
+
+        // 3. 필터링 결과 처리
+        if (foundPredictions.isNotEmpty()) {
+            Log.d("StockDividends", "--- 캐시된 배당 예측 정보 발견 ---")
+            foundPredictions.forEach { prediction ->
+                Log.d("StockDividends", "종목: ${prediction.name}, 배당년도: ${prediction.year}, 분기: ${prediction.quarter}, 주식: ${prediction.kind}, 배당금: ${prediction.actual_dividend}")
+            }
+            Log.d("StockDividends", "---------------------------------")
+
+            // ⭐⭐ UI 업데이트 로직 추가 ⭐⭐
+            // 데이터 업데이트 및 UI 표시
+            dividendPredictionAdapter.updateList(foundPredictions)
+            binding.dividendTableHeader.visibility = View.VISIBLE
+            binding.companyInfoRecyclerView.visibility = View.VISIBLE
+
+            // TODO: UI에 배당 정보를 표시하는 로직을 여기에 추가해야 합니다.
+            // 예를 들어: displayDividendPredictions(foundPredictions)
+
+        } else {
+            Log.d("StockDividends", "CorpCode $corpCode 에 대한 배당 예측 정보를 찾을 수 없습니다.")
+            Toast.makeText(context, "해당 종목의 예측 배당 정보가 없습니다.", Toast.LENGTH_SHORT).show()
+
+            // 정보가 없으므로 UI 숨김 및 어댑터 리스트 비우기
+            dividendPredictionAdapter.updateList(emptyList())
+            binding.dividendTableHeader.visibility = View.GONE
+            binding.companyInfoRecyclerView.visibility = View.GONE
+        }
+    }
 
 
     // ✨✨✨ 수정된 즐겨찾기 버튼 설정 ✨✨✨

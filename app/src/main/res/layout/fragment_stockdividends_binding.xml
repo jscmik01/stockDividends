@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.stockdividends.StockdividendsFragment">
 
-
-    <!-- 종목 검색을 위한 SearchView -->
     <SearchView
         android:id="@+id/stock_search_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"  android:iconifiedByDefault="false"
+        android:layout_marginEnd="8dp"
+        android:iconifiedByDefault="false"
         android:queryHint="종목검색"
         android:background="@drawable/search_view_background"
         app:layout_constraintEnd_toStartOf="@+id/favorite_button_home"
@@ -27,21 +27,24 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_star_border" android:contentDescription="즐겨찾기"
+        android:src="@drawable/ic_star_border"
+        android:contentDescription="즐겨찾기"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/stock_search_view"
         app:layout_constraintBottom_toBottomOf="@+id/stock_search_view"
-        app:tint="@null" /> <Button
-    android:id="@+id/dividend_button"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginEnd="16dp"
-    android:text="배당금 조회"
-    android:visibility="gone"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/stock_search_view"
-    tools:visibility="visible" />
+        app:tint="@null" />
+
+    <Button
+        android:id="@+id/dividend_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="배당금 조회"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/stock_search_view"
+        tools:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/dividend_table_header"
@@ -56,24 +59,23 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/dividend_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"> <!-- 처음에는 숨겨진 상태 -->
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-
-            android:gravity="center"
-            android:text="년도"
+            android:layout_weight="1.2"
+            android:gravity="start"
+            android:text="년도 / 분기"
             android:textStyle="bold"
             android:textColor="@android:color/black" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.8"
             android:gravity="center"
-            android:text="분기"
+            android:text="주식 종류"
             android:textStyle="bold"
             android:textColor="@android:color/black"/>
 
@@ -81,8 +83,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="주식종류"
+            android:gravity="end"
+            android:text="배당금"
             android:textStyle="bold"
             android:textColor="@android:color/black"/>
 
@@ -90,8 +92,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="배당금(배당비율)"
+            android:gravity="end"
+            android:text="배당률"
             android:textStyle="bold"
             android:textColor="@android:color/black"/>
     </LinearLayout>
@@ -106,17 +108,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- API 검색 결과를 보여줄 RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/company_info_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="0dp" app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dividend_table_header"
         android:visibility="gone"
-        tools:listitem="@layout/list_item_company_info"/>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        tools:listitem="@layout/list_item_dividend_prediction"/> </androidx.constraintlayout.widget.ConstraintLayout>

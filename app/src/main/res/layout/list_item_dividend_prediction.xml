@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/text_year_quarter"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.2"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        tools:text="2024년 4분기" />
+
+    <TextView
+        android:id="@+id/text_stock_kind"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:gravity="center"
+        tools:text="보통주" />
+
+    <TextView
+        android:id="@+id/text_actual_dividend"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="#2E7D32"
+        android:textStyle="bold"
+        tools:text="500원" />
+
+    <TextView
+        android:id="@+id/text_reported_yield"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="#1976D2"
+        tools:text="(1.93%)" />
+
+</LinearLayout>
